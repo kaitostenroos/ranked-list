@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "anime-list",
-    "slug": "anime-list",
+    "name": "ranked-list",
+    "slug": "ranked-list",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "animelist",
+    "scheme": "rankedlist",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -38,7 +38,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,
