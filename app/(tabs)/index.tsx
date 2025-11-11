@@ -1,16 +1,17 @@
+import { router, useFocusEffect } from "expo-router";
 import * as SQLite from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
-import { Appbar, Card, PaperProvider, Text } from "react-native-paper";
+import { Appbar, Card, FAB, PaperProvider, Text } from "react-native-paper";
 
 export default function ListSelector() {
   const db = SQLite.openDatabaseSync("listdb");
-  const [rankedLists, setRankedLists] = useState([])
+  const [rankedLists, setRankedLists] = useState([]);
 
   const dropTable = async () => {
     await db.execAsync(`
-      DROP TABLE RankedLists`)
-  }
+      DROP TABLE RankedLists`);
+  };
 
   const initialize = async () => {
     try {
@@ -24,9 +25,9 @@ export default function ListSelector() {
 
   const insertExampleData = async () => {
     try {
-      const tableCheck = await db.getAllAsync('SELECT * FROM RankedLists')
+      const tableCheck = await db.getAllAsync("SELECT * FROM RankedLists");
       const tableIsEmpty = tableCheck.length === 0;
-      console.log(tableCheck)
+      console.log(tableCheck);
 
       if (tableIsEmpty) {
         await db.execAsync(`
@@ -35,18 +36,18 @@ export default function ListSelector() {
             (2, 'Top Movies', 'https://picsum.photos/700', 'All-time favorite movies.', '2025-11-07', '2025-11-08');
         `);
       } else {
-        console.log("Interting example data failed: Table has data")
+        console.log("Interting example data failed: Table has data");
       }
     } catch (error) {
-      console.error("Could not insert example data", error )
+      console.error("Could not insert example data", error);
     }
-  }
+  };
 
   const updateList = async () => {
     try {
-      const list = await db.getAllAsync("SELECT * from RankedLists");
-      setRankedLists(list);
-      console.log("UPDATED: ", list)
+      const lists = await db.getAllAsync("SELECT * from RankedLists");
+      setRankedLists(lists);
+      console.log("UPDATED: ", lists);
     } catch (error) {
       console.error("Could not get items", error);
     }
@@ -54,7 +55,7 @@ export default function ListSelector() {
 
   useEffect(() => {
     const bootstrap = async () => {
-      await dropTable(); //for dev purposes
+      //await dropTable(); //for dev purposes, remove from prod
       await initialize();
       await insertExampleData();
       await updateList();
@@ -63,21 +64,42 @@ export default function ListSelector() {
     bootstrap();
   }, []);
 
+  useFocusEffect(() => {
+    updateList();
+  });
+
   return (
     <PaperProvider>
       <Appbar.Header>
         <Appbar.Content title="Ranked List" />
       </Appbar.Header>
+      <FAB
+        label="New List"
+        icon="plus"
+        style={styles.fab}
+        onPress={() => router.push({ pathname: "../addList" })}
+      />
       <FlatList
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Card style={styles.card}>
-            <Card.Cover source={{ uri: item.bannersrc }} style={styles.cardCover} />
+            <Card.Cover
+              source={{ uri: item.bannersrc }}
+              style={styles.cardCover}
+            />
             <Card.Content>
-              <Text variant="headlineLarge" style={styles.title}>{item.title}</Text>
-              <Text variant="bodyLarge" style={styles.description}>{item.description}</Text>
-              <Text variant="labelSmall" style={styles.date}>Created: {item.created}</Text>
-              <Text variant="labelSmall" style={styles.date}>Updated: {item.updated}</Text>
+              <Text variant="headlineLarge" style={styles.title}>
+                {item.title}
+              </Text>
+              <Text variant="bodyLarge" style={styles.description}>
+                {item.description}
+              </Text>
+              <Text variant="labelSmall" style={styles.date}>
+                Created: {item.created}
+              </Text>
+              <Text variant="labelSmall" style={styles.date}>
+                Updated: {item.updated}
+              </Text>
             </Card.Content>
           </Card>
         )}
@@ -88,12 +110,18 @@ export default function ListSelector() {
 }
 
 const styles = StyleSheet.create({
+  fab: {
+    position: "absolute",
+    margin: 20,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+  },
   card: {
     margin: 10,
   },
   cardCover: {
     marginBottom: 8,
-
   },
   title: {
     marginBottom: 8,
