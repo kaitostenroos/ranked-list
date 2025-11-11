@@ -1,8 +1,8 @@
 import { router, useFocusEffect } from "expo-router";
 import * as SQLite from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet } from "react-native";
-import { Appbar, Card, FAB, PaperProvider, Text } from "react-native-paper";
+import { FlatList, StyleSheet } from 'react-native'; // Changed to match _layout.tsx
+import { Appbar, Card, FAB, Surface, Text } from "react-native-paper";
 
 export default function ListSelector() {
   const db = SQLite.openDatabaseSync("listdb");
@@ -69,17 +69,14 @@ export default function ListSelector() {
   });
 
   return (
-    <PaperProvider>
+    <>
+      <Surface style={styles.container}>
       <Appbar.Header>
         <Appbar.Content title="Ranked List" />
       </Appbar.Header>
-      <FAB
-        label="New List"
-        icon="plus"
-        style={styles.fab}
-        onPress={() => router.push({ pathname: "../addList" })}
-      />
       <FlatList
+        style={styles.list}
+        contentContainerStyle={{ paddingBottom: 96 }}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Card style={styles.card}>
@@ -105,17 +102,32 @@ export default function ListSelector() {
         )}
         data={rankedLists}
       />
-    </PaperProvider>
+    </Surface>
+    <FAB
+        label="New List"
+        icon="plus"
+        style={styles.fab}
+        onPress={() => router.push({ pathname: "../addList" })}
+      />
+    </>
+    
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  list: {
+    flex: 1,
+  },
   fab: {
     position: "absolute",
     margin: 20,
     right: 0,
     bottom: 0,
     zIndex: 999,
+    elevation: 6,
   },
   card: {
     margin: 10,
