@@ -20,7 +20,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ contentStyle: { backgroundColor: theme.colors.background } }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="addList" options={{ presentation: 'modal', title: 'Add New List', headerShown: false }} />
-          <Stack.Screen name="listitems" />
+          <Stack.Screen name="listitems/[id]" options={{ headerShown: false }}/>
         </Stack>
         <StatusBar style="auto" />
       </PaperProvider>
