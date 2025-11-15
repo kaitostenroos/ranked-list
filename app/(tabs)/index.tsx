@@ -79,7 +79,7 @@ export default function ListSelector() {
         contentContainerStyle={{ paddingBottom: 96 }}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <Card style={styles.card}>
+          <Card style={styles.card} onPress={(() => router.push({pathname: "../listitems/[id]", params: {id: item.id, title: item.title}}))}>
             <Card.Cover
               source={{ uri: item.bannersrc }}
               style={styles.cardCover}
