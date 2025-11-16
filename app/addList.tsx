@@ -1,11 +1,10 @@
 import { useNavigation } from "expo-router";
-import * as SQLite from "expo-sqlite";
 import { useState } from "react";
 import { StyleSheet } from "react-native";
 import { Appbar, Button, Surface, TextInput } from "react-native-paper";
+import { db } from "../database/opendb";
 
 export default function AddList() {
-  const db = SQLite.openDatabaseSync("listdb");
   const navigation = useNavigation();
   const [title, setTitle] = useState("");
   const [bannersrc, setBannersrc] = useState("");

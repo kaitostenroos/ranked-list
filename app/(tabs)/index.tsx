@@ -1,26 +1,15 @@
 import { router, useFocusEffect } from "expo-router";
-import * as SQLite from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet } from 'react-native'; // Changed to match _layout.tsx
+import { FlatList, StyleSheet } from 'react-native';
 import { Appbar, Card, FAB, Surface, Text } from "react-native-paper";
+import { db, initializeDatabase } from "../../database/opendb";
 
 export default function ListSelector() {
-  const db = SQLite.openDatabaseSync("listdb");
   const [rankedLists, setRankedLists] = useState([]);
 
   const dropTable = async () => {
     await db.execAsync(`
       DROP TABLE RankedLists`);
-  };
-
-  const initialize = async () => {
-    try {
-      await db.execAsync(`
-        CREATE TABLE IF NOT EXISTS RankedLists (id INTEGER PRIMARY KEY, title TEXT NOT NULL, bannersrc TEXT, description TEXT, created TEXT NOT NULL, updated TEXT NOT NULL );
-      `);
-    } catch (error) {
-      console.error("Could not open database for lists", error);
-    }
   };
 
   const insertExampleData = async () => {
@@ -36,14 +25,14 @@ export default function ListSelector() {
             (2, 'Top Movies', 'https://picsum.photos/700', 'All-time favorite movies.', '2025-11-07', '2025-11-08');
         `);
       } else {
-        console.log("Interting example data failed: Table has data");
+        console.log("Inserting example data failed: Table has data");
       }
     } catch (error) {
       console.error("Could not insert example data", error);
     }
   };
 
-  const updateList = async () => {
+  const updateLists = async () => {
     try {
       const lists = await db.getAllAsync("SELECT * from RankedLists");
       setRankedLists(lists);
@@ -56,16 +45,16 @@ export default function ListSelector() {
   useEffect(() => {
     const bootstrap = async () => {
       //await dropTable(); //for dev purposes, remove from prod
-      await initialize();
+      await initializeDatabase();
       await insertExampleData();
-      await updateList();
+      await updateLists();
     };
 
     bootstrap();
   }, []);
 
   useFocusEffect(() => {
-    updateList();
+    updateLists();
   });
 
   return (
@@ -79,7 +68,7 @@ export default function ListSelector() {
         contentContainerStyle={{ paddingBottom: 96 }}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <Card style={styles.card} onPress={(() => router.push({pathname: "../listitems/[id]", params: {id: item.id, title: item.title}}))}>
+          <Card style={styles.card} onPress={(() => router.push({pathname: "../listitems/[id]", params: {id: item.id, title: item.title, description: item.description}}))}>
             <Card.Cover
               source={{ uri: item.bannersrc }}
               style={styles.cardCover}

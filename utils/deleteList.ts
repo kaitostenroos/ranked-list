@@ -1,13 +1,7 @@
-import * as SQLite from "expo-sqlite";
+import { db } from "../database/opendb";
 
-export function deleteList(id) {
-    const db = SQLite.openDatabaseSync("listdb");
-
-    const deleteList = async () => {
-        await db.execAsync(`
-            DELETE FROM RankedLists WHERE id = ${id};
-        `)
-    }
-
-    deleteList();
+export async function deleteList(id) {
+    await db.execAsync(`
+        DELETE FROM RankedLists WHERE id = ${id};
+    `);
 }
