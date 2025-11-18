@@ -1,11 +1,10 @@
+import { db } from "@/database/opendb";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import * as SQLite from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { Appbar, Button, Surface, TextInput } from "react-native-paper";
 
 export default function EditList() {
-  const db = SQLite.openDatabaseSync("listdb");
   const navigation = useNavigation();
   const { id } = useLocalSearchParams();
   const [title, setTitle] = useState("");

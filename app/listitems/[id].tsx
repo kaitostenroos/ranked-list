@@ -1,15 +1,18 @@
+import ListItemTable from "@/components/listItemTable";
+import { createTableForListItems } from "@/database/opendb";
 import { deleteList } from "@/utils/deleteList";
+import { fetchListItems } from "@/utils/fetchListItems";
 import { updateList } from "@/utils/updateList";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { StyleSheet } from "react-native";
-import { Appbar, Surface, Text } from "react-native-paper";
+import { Appbar, Surface } from "react-native-paper";
 
 export default function ListItems() {
   const { id } = useLocalSearchParams();
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [listItems, setListItems] = useState([]);
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -34,18 +37,26 @@ export default function ListItems() {
       const updatedList = await updateList(id);
       if (updatedList) {
         setTitle(updatedList.title || "");
-        setDescription(updatedList.description || "");
       } else {
         console.warn("updateList returned null or undefined");
       }
     } catch (error) {
       console.error("Failed to update list title and description", error);
-      // Optionally, show a user-friendly alert here using Alert from react-native
+    }
+    try {
+      const fetchedListItems = await fetchListItems(id);
+      setListItems(fetchedListItems);
+    } catch (error) {
+      console.error("Could not fetch list items", error)
     }
   };
 
   useFocusEffect(() => {
     handleUpdate();
+  });
+
+  useEffect(() => {
+    createTableForListItems(id);
   });
 
   return (
@@ -64,7 +75,7 @@ export default function ListItems() {
         />
         <Appbar.Action icon={"delete"} onPress={handleDelete} />
       </Appbar.Header>
-      <Text variant="titleMedium">{description}</Text>
+      <ListItemTable items={listItems}/>
     </Surface>
   );
 }
@@ -73,4 +84,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  description: {
+    margin: 10
+  }
 });

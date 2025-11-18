@@ -2,14 +2,20 @@ import { router, useFocusEffect } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet } from 'react-native';
 import { Appbar, Card, FAB, Surface, Text } from "react-native-paper";
-import { db, initializeDatabase } from "../../database/opendb";
+import { createTableForListItems, createTableForLists, db } from "../../database/opendb";
 
 export default function ListSelector() {
   const [rankedLists, setRankedLists] = useState([]);
 
   const dropTable = async () => {
     await db.execAsync(`
-      DROP TABLE RankedLists`);
+      DROP TABLE IF EXISTS list_1_items
+    `);
+    await db.execAsync(`
+      DROP TABLE IF EXISTS list_2_items
+    `);
+    await db.execAsync(`
+      DROP TABLE IF EXISTS RankedLists`);
   };
 
   const insertExampleData = async () => {
@@ -23,6 +29,20 @@ export default function ListSelector() {
           INSERT INTO RankedLists (id, title, bannersrc, description, created, updated) VALUES
             (1, 'My Top Games', 'https://picsum.photos/700', 'A short ranked list of favorite games.', '2025-11-08', '2025-11-09'),
             (2, 'Top Movies', 'https://picsum.photos/700', 'All-time favorite movies.', '2025-11-07', '2025-11-08');
+        `);
+        await createTableForListItems(1);
+        await db.execAsync(`
+          INSERT INTO list_1_items (id, itemTitle, itemDescription, rank) VALUES
+            (1, 'The Legend of Zelda: Breath of the Wild', 'An open-world adventure game.', '1'),
+            (2, 'Super Mario Odyssey', 'A 3D platformer with exploration.', '1.5'),
+            (3, 'The Witcher 3: Wild Hunt', 'A fantasy RPG with deep storytelling.', '1.6');
+        `);
+        await createTableForListItems(2);
+        await db.execAsync(`
+          INSERT INTO list_2_items (id, itemTitle, itemDescription, rank) VALUES
+            (1, 'The Shawshank Redemption', 'A drama about hope and friendship.', '1'),
+            (2, 'The Godfather', 'A crime saga about family and power.', '2'),
+            (3, 'Pulp Fiction', 'A nonlinear crime film.', '3');
         `);
       } else {
         console.log("Inserting example data failed: Table has data");
@@ -45,7 +65,7 @@ export default function ListSelector() {
   useEffect(() => {
     const bootstrap = async () => {
       //await dropTable(); //for dev purposes, remove from prod
-      await initializeDatabase();
+      await createTableForLists();
       await insertExampleData();
       await updateLists();
     };
@@ -53,6 +73,7 @@ export default function ListSelector() {
     bootstrap();
   }, []);
 
+  //remove this when dropping tables
   useFocusEffect(() => {
     updateLists();
   });
