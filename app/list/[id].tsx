@@ -1,8 +1,8 @@
 import ListItemTable from "@/components/listItemTable";
 import { createTableForListItems } from "@/database/opendb";
 import { deleteList } from "@/utils/deleteList";
+import { fetchList } from "@/utils/fetchList";
 import { fetchListItems } from "@/utils/fetchListItems";
-import { updateList } from "@/utils/updateList";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 
@@ -28,15 +28,15 @@ export default function ListItems() {
     }
   };
 
-  const handleUpdate = async () => {
+  const handleFetch = async () => {
     if (!id) {
       console.error("Invalid id: cannot update list");
       return;
     }
     try {
-      const updatedList = await updateList(id);
-      if (updatedList) {
-        setTitle(updatedList.title || "");
+      const fetchedList = await fetchList(id);
+      if (fetchedList) {
+        setTitle(fetchedList.title || "");
       } else {
         console.warn("updateList returned null or undefined");
       }
@@ -52,7 +52,7 @@ export default function ListItems() {
   };
 
   useFocusEffect(() => {
-    handleUpdate();
+    handleFetch();
   });
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function ListItems() {
         />
         <Appbar.Action icon={"delete"} onPress={handleDelete} />
       </Appbar.Header>
-      <ListItemTable items={listItems}/>
+      <ListItemTable items={listItems} listId={id}/>
     </Surface>
   );
 }
