@@ -3,17 +3,18 @@ import { createTableForListItems } from "@/database/opendb";
 import { deleteList } from "@/utils/deleteList";
 import { fetchList } from "@/utils/fetchList";
 import { fetchListItems } from "@/utils/fetchListItems";
+
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-
 import { StyleSheet } from "react-native";
-import { Appbar, Surface } from "react-native-paper";
+import { Appbar, FAB, Surface } from "react-native-paper";
 
 export default function ListItems() {
+  const router = useRouter();
   const { id } = useLocalSearchParams();
   const [title, setTitle] = useState("");
   const [listItems, setListItems] = useState([]);
-  const router = useRouter();
+  
 
   const handleDelete = async () => {
     if (!id) {
@@ -47,7 +48,7 @@ export default function ListItems() {
       const fetchedListItems = await fetchListItems(id);
       setListItems(fetchedListItems);
     } catch (error) {
-      console.error("Could not fetch list items", error)
+      console.error("Could not fetch list items", error);
     }
   };
 
@@ -75,16 +76,27 @@ export default function ListItems() {
         />
         <Appbar.Action icon={"delete"} onPress={handleDelete} />
       </Appbar.Header>
-      <ListItemTable items={listItems} listId={id}/>
+      <FAB
+        icon="plus"
+        style={styles.fab}
+        onPress={() => router.push({pathname: "../../addListItem", params: {listId: id}})}
+      />
+      <ListItemTable items={listItems} listId={id} />
     </Surface>
   );
 }
 
 const styles = StyleSheet.create({
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+  },
   container: {
     flex: 1,
   },
   description: {
-    margin: 10
-  }
+    margin: 10,
+  },
 });
