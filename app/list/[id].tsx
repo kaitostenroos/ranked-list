@@ -77,6 +77,7 @@ export default function ListItems() {
         <Appbar.Action icon={"delete"} onPress={handleDelete} />
       </Appbar.Header>
       <FAB
+        label="New Entry"
         icon="plus"
         style={styles.fab}
         onPress={() => router.push({pathname: "../../addListItem", params: {listId: id}})}
@@ -89,9 +90,10 @@ export default function ListItems() {
 const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
-    margin: 16,
+    margin: 30,
     right: 0,
     bottom: 0,
+    zIndex: 999,
   },
   container: {
     flex: 1,

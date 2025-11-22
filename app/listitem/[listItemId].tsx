@@ -1,25 +1,26 @@
+import { deleteListItem } from "@/utils/deleteListItem";
 import { fetchListItem } from "@/utils/fetchListItem";
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Surface, Text } from "react-native-paper";
+import { StyleSheet } from "react-native";
+import { Appbar, Surface, Text } from "react-native-paper";
 
 export default function ListItemDetails() {
+  //id of this list item
   const { id } = useLocalSearchParams();
+  //id of list item belongs to
   const { listId } = useLocalSearchParams();
   const [listItemTitle, setListItemTitle] = useState("");
   const [listItemDesc, setListItemDesc] = useState("");
-  const [rank, setRank] = useState(1);
+  const [rank, setRank] = useState("");
 
   const handleFetch = async () => {
-    if (!id) {
-      console.error("Invalid id: cannot update list item");
-      return;
-    }
     try {
       const fetchedListItem = await fetchListItem({id, listId});
       if (fetchedListItem) {
         setListItemTitle(fetchedListItem.itemTitle || "");
         setListItemDesc(fetchedListItem.itemDescription || "");
+        setRank(fetchedListItem.rank || "");
       } else {
         console.warn("fetchListItem returned null or undefined");
       }
@@ -28,15 +29,46 @@ export default function ListItemDetails() {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteListItem(id, listId);
+      router.back();
+    } catch (error){
+      console.error("Failed to delete list item", error);
+    }
+  }
+
   useFocusEffect(() => {
-    handleFetch(id);
+    handleFetch();
   });
 
   return(
-    <Surface>
-      <Text>{listItemTitle}</Text>
-      <Text>{listItemDesc}</Text>
-      <Text>{rank}</Text>
+    <Surface style={styles.descContainer}>
+      <Appbar.Header>
+        <Appbar.BackAction onPress={() => router.back()} />
+        <Appbar.Content title={listItemTitle} />
+        <Appbar.Action
+          icon={"pencil"}
+          onPress={() =>
+            router.push({
+              pathname: "../../editListItem",
+              params: { id: id, listId: listId, listItemTitle: listItemTitle, listItemDesc: listItemDesc, listItemRank: rank },
+            })
+          }
+        />
+        <Appbar.Action icon={"delete"} onPress={handleDelete} />
+      </Appbar.Header>
+      <Text variant="titleMedium" style={styles.desc}>Description:</Text>
+      <Text variant="bodyLarge" style={styles.desc}>{listItemDesc}</Text>
     </Surface>
   );
 }
+
+const styles = StyleSheet.create({
+  descContainer: {
+    flex: 1,
+  },
+  desc: {
+    margin: 10,
+  }
+})
