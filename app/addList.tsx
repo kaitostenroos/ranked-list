@@ -1,14 +1,16 @@
+import * as ExpoImagePicker from "expo-image-picker";
+
 import { useNavigation } from "expo-router";
 import { useState } from "react";
-import { StyleSheet } from "react-native";
+import { Image, StyleSheet } from "react-native";
 import { Appbar, Button, Surface, TextInput } from "react-native-paper";
 import { db } from "../database/opendb";
 
 export default function AddList() {
   const navigation = useNavigation();
-  const [title, setTitle] = useState("");
-  const [bannersrc, setBannersrc] = useState("");
+  const [title, setTitle] = useState("")
   const [description, setDescription] = useState("");
+  const [image, setImage] = useState<string | null>(null);
 
   const addList = async () => {
     if (!title.trim()) {
@@ -19,7 +21,7 @@ export default function AddList() {
     try {
       await db.runAsync(
         "INSERT INTO RankedLists (title, bannersrc, description, created, updated) VALUES (?, ?, ?, ?, ?)",
-        [title, bannersrc, description, now, now]
+        [title, image, description, now, now]
       );
       alert("List added successfully");
       navigation.goBack();
@@ -28,6 +30,21 @@ export default function AddList() {
       alert("Failed to add list");
     }
   };
+
+  const pickImage = async () => {
+      let result = await ExpoImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 1,
+      });
+  
+      console.log(result);
+  
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    };
 
   return (
     <Surface style={styles.inputContainer}> 
@@ -47,13 +64,8 @@ export default function AddList() {
         onChangeText={setDescription}
         style={styles.input}
       />
-      <TextInput
-        label="Banner URL"
-        value={bannersrc}
-        onChangeText={setBannersrc}
-        multiline
-        style={styles.input}
-      />
+      {image && <Image source={{ uri: image }} style={styles.image} />}
+      <Button style={styles.secondaryButton} mode="outlined" onPress={pickImage}>Select Image</Button>
       <Button mode="contained" onPress={addList} style={styles.button}>
         Add List
       </Button>
@@ -69,6 +81,19 @@ const styles = StyleSheet.create({
     margin: 16,
   },
   button: {
-    marginTop: 20,
+    margin: 16,
+    marginTop: 30,
+  },
+  secondaryButton: {
+    width: 200,
+    margin: 16,
+    marginBottom: 20,
+    alignSelf: "center",
+  },
+  image: {
+    margin: 16,
+    height: 200,
+    aspectRatio: "16/9",
+    borderRadius: 8,
   },
 });
