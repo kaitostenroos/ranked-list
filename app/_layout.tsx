@@ -24,6 +24,7 @@ export default function RootLayout() {
           <Stack.Screen name="editList" options={{ headerShown: false }}/>
           <Stack.Screen name="listitem/[listItemId]" options={{ headerShown: false }}/>
           <Stack.Screen name='addListItem' options={{headerShown: false}} />
+          <Stack.Screen name='editListItem' options={{headerShown: false}} />
         </Stack>
         <StatusBar style="auto" />
       </PaperProvider>

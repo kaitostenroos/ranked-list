@@ -55,7 +55,7 @@ export default function EditListItem() {
       />
       <TextInput label="Rank" value={rank} onChangeText={setRank} style={styles.input} />
       <Button mode="contained" onPress={handleSave} style={styles.button}>
-        Add Item
+        Save
       </Button>
     </Surface>
   );

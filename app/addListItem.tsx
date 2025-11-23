@@ -54,7 +54,7 @@ export default function AddListItem() {
       />
       <TextInput label="Rank" value={rank} onChangeText={setRank} style={styles.input} />
       <Button mode="contained" onPress={handleAdd} style={styles.button}>
-        Add Item
+        Add
       </Button>
     </Surface>
   );
