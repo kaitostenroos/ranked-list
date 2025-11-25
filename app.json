@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "ranked-list",
+    "name": "Ranked List",
     "slug": "ranked-list",
-    "version": "1.0.0",
+    "version": "0.9.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rankedlist",
@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.kaitostenroos.rankedlist"
     },
     "web": {
       "output": "static",
@@ -44,6 +45,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "48e770dd-ff1f-494f-bbc8-43fc29dcdd82"
+      }
     }
   }
 }
