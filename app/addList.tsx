@@ -36,7 +36,7 @@ export default function AddList() {
       console.log(result);
   
       if (result.canceled) {
-        setImage(undefined);  // Instead of null
+        setImage(undefined);
       } else {
         setImage(result.assets[0].uri);
       }

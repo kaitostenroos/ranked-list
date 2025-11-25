@@ -1,15 +1,17 @@
 import { db } from "@/database/opendb";
+
+import * as ExpoImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { Image, StyleSheet } from "react-native";
 import { Appbar, Button, Surface, TextInput } from "react-native-paper";
 
 export default function EditList() {
   const navigation = useNavigation();
   const { id } = useLocalSearchParams();
-  const [title, setTitle] = useState("");
-  const [bannersrc, setBannersrc] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState<string | undefined>(undefined);
+  const [description, setDescription] = useState<string | undefined>(undefined);
+  const [image, setImage] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const fetchList = async () => {
@@ -20,7 +22,7 @@ export default function EditList() {
         );
         if (result) {
           setTitle(result.title || "");
-          setBannersrc(result.bannersrc || "");
+          setImage(result.bannersrc || "");
           setDescription(result.description || "");
         }
       } catch (error) {
@@ -39,7 +41,7 @@ export default function EditList() {
     try {
       await db.runAsync(
         "UPDATE RankedLists SET title = ?, bannersrc = ?, description = ?, updated = ? WHERE id = ?",
-        [title, bannersrc, description, now, id]
+        [title, image, description, now, id]
       );
       alert("List updated successfully");
       navigation.goBack();
@@ -48,6 +50,23 @@ export default function EditList() {
       alert("Failed to update list");
     }
   };
+
+  const pickImage = async () => {
+        let result = await ExpoImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          allowsEditing: true,
+          aspect: [16, 9],
+          quality: 1,
+        });
+    
+        console.log(result);
+    
+        if (result.canceled) {
+          setImage(undefined);
+        } else {
+          setImage(result.assets[0].uri);
+        }
+      };
 
   return (
     <Surface style={styles.inputContainer}>
@@ -67,13 +86,8 @@ export default function EditList() {
         onChangeText={setDescription}
         style={styles.input}
       />
-      <TextInput
-        label="Banner URL"
-        value={bannersrc}
-        onChangeText={setBannersrc}
-        multiline
-        style={styles.input}
-      />
+      {image && <Image source={{ uri: image }} style={styles.image} />}
+      <Button style={styles.secondaryButton} mode="outlined" onPress={pickImage}>Select Image</Button>
       <Button mode="contained" onPress={handleSave} style={styles.button}>
         Save
       </Button>
@@ -90,5 +104,17 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
+  },
+  secondaryButton: {
+    width: 200,
+    margin: 16,
+    marginBottom: 20,
+    alignSelf: "center",
+  },
+  image: {
+    margin: 16,
+    height: 200,
+    aspectRatio: "16/9",
+    borderRadius: 8,
   },
 });
