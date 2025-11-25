@@ -1,34 +1,28 @@
 import * as ExpoImagePicker from "expo-image-picker";
 
+import { insertList } from "@/utils/insertList";
 import { useNavigation } from "expo-router";
 import { useState } from "react";
 import { Image, StyleSheet } from "react-native";
 import { Appbar, Button, Surface, TextInput } from "react-native-paper";
-import { db } from "../database/opendb";
 
 export default function AddList() {
   const navigation = useNavigation();
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [title, setTitle] = useState<string | undefined>(undefined);
+  const [description, setDescription] = useState<string | undefined>(undefined);
+  const [image, setImage] = useState<string | undefined>(undefined);
 
-  const addList = async () => {
-    if (!title.trim()) {
+  const handleAdd = async () => {
+    if (title == null) {
+      alert("Title is required");
+      return;
+    } else if(!title.trim()) {
       alert("Title is required");
       return;
     }
     const now = new Date().toISOString().split("T")[0];
-    try {
-      await db.runAsync(
-        "INSERT INTO RankedLists (title, bannersrc, description, created, updated) VALUES (?, ?, ?, ?, ?)",
-        [title, image, description, now, now]
-      );
-      alert("List added successfully");
-      navigation.goBack();
-    } catch (error) {
-      console.error("Could not add list", error);
-      alert("Failed to add list");
-    }
+    insertList(title, image || "", description || "", now, now)
+    navigation.goBack();
   };
 
   const pickImage = async () => {
@@ -41,7 +35,9 @@ export default function AddList() {
   
       console.log(result);
   
-      if (!result.canceled) {
+      if (result.canceled) {
+        setImage(undefined);  // Instead of null
+      } else {
         setImage(result.assets[0].uri);
       }
     };
@@ -66,7 +62,7 @@ export default function AddList() {
       />
       {image && <Image source={{ uri: image }} style={styles.image} />}
       <Button style={styles.secondaryButton} mode="outlined" onPress={pickImage}>Select Image</Button>
-      <Button mode="contained" onPress={addList} style={styles.button}>
+      <Button mode="contained" onPress={handleAdd} style={styles.button}>
         Add List
       </Button>
     </Surface>
